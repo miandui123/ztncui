@@ -46,3 +46,23 @@ exports.restrict = function(req, res, next) {
     res.redirect('/login?redirect=' + encodeURIComponent(req.originalUrl));
   }
 }
+
+// 只允许管理员访问
+exports.restrictAdmin = function(req, res, next) {
+  if (req.session.user && (req.session.user.role === 'admin' || req.session.user.role === 'super_admin')) {
+    next();
+  } else {
+    req.session.error = '需要管理员权限！';
+    res.redirect('/controller');
+  }
+}
+
+// 只允许超级管理员访问
+exports.restrictSuperAdmin = function(req, res, next) {
+  if (req.session.user && req.session.user.role === 'super_admin') {
+    next();
+  } else {
+    req.session.error = '需要超级管理员权限！';
+    res.redirect('/controller');
+  }
+}
