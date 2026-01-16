@@ -21,7 +21,7 @@ function guest_only(req, res, next) {
 
 /* GET home page. */
 router.get('/', guest_only, function(req, res, next) {
-  res.render('front_door', {title: 'ztncui'});
+  res.render('front_door', {title: '欢迎来到TsingWin算力网络控制中心'});
 });
 
 router.get('/logout', function(req, res) {

@@ -1,22 +1,78 @@
 //-
   ztncui - ZeroTier network controller UI
-  Copyright (C) 2017-2021  Key Networks (https://key-networks.com)
+  Copyright (C) 2017-2021  TsingWin (http://www.tsingwin.net)
   Licensed under GPLv3 - see LICENSE for details.
 
 extends users_layout
 
 block users_content
-  table.table.table-responsive.table-striped.table-hover
-    each user in users
-      tr
-        td(width='3%')
-          a(href='/users/' + user.name + '/delete')
-            i.glyphicon.glyphicon-trash
-        td(width='15%')
-          a(href='/users/' + user.name + '/password') #{user.name}
-        td(width='82%')
-          a(href='/users/' + user.name + '/password') set password
+  if message
+    .alert.alert-success
+      strong= message
+      button.close(type='button', data-dismiss='alert') &times;
 
-    else
-      .alert.alert-info
-        strong There are no users on this system
+  if error
+    .alert.alert-danger
+      strong= error
+      button.close(type='button', data-dismiss='alert') &times;
+
+  if users
+    table.table.table-responsive.table-striped.table-hover
+      thead
+        tr
+          th(width='5%') 操作
+          th(width='15%') #{t.register.username}
+          th(width='10%') 角色
+          th(width='15%') 密码状态
+          th(width='20%') 管理员操作
+          th(width='35%') 说明
+      tbody
+        each user in users
+          tr
+            td
+              form(method='POST', action='/users/' + user.name + '/delete', onsubmit=`return confirm('${t.users.delete_confirm.replace('%s', user.name)}')`)
+                button.btn.btn-xs.btn-danger(type='submit' name='delete' value='delete')
+                  i.glyphicon.glyphicon-trash
+            td
+              strong= user.name
+            td
+              - let roleText = t.users.role_user;
+              - let roleClass = 'info';
+              if user.role === 'admin'
+                - roleText = t.users.role_admin;
+                - roleClass = 'warning';
+              if user.role === 'super_admin'
+                - roleText = t.users.role_super_admin;
+                - roleClass = 'danger';
+              span(class="label-#{roleClass}")= roleText
+            td
+              if user.pass_set
+                span.label.label-success= t.users.password_set
+              else
+                span.label.label-danger= t.users.password_not_set
+            td
+              // 只有超级管理员才能进行这些操作
+              if user.role !== 'super_admin'
+                if user.role !== 'admin'
+                  form(method='POST', action='/users/' + user.name + '/promote', style='display:inline')
+                    button.btn.btn-xs.btn-primary(type='submit', title=t.users.promote_to_admin)
+                      i.glyphicon.glyphicon-star
+                      | #{t.users.promote_to_admin}
+                form(method='POST', action='/users/' + user.name + '/reset-password', style='display:inline; margin-left:5px')
+                  button.btn.btn-xs.btn-warning(type='submit', title=t.users.reset_password, onsubmit=`return confirm('${t.users.reset_password_confirm.replace('%s', user.name)}')`)
+                    i.glyphicon.glyphicon-refresh
+                    | #{t.users.reset_password}
+              else
+                span.text-muted= t.users.super_admin_only
+            td
+              - let desc = '可以管理网络控制器';
+              if user.role === 'admin'
+                - desc = '可以创建和管理用户';
+              if user.role === 'super_admin'
+                - desc = '最高权限，可以管理所有用户';
+              small.text-muted= desc
+
+  else
+    .alert.alert-info
+      strong= t.users.no_users
+

@@ -49,6 +49,8 @@ exports.users_list = async function(req, res) {
       active: 'users',
     }
 
+  const t = res.locals.t;
+
   try {
     const users = await get_users();
 
@@ -56,12 +58,14 @@ exports.users_list = async function(req, res) {
     let isSuperAdmin = req.session.user && req.session.user.role === 'super_admin';
 
     if (!isSuperAdmin) {
-      return res.render('users', { title: '用户管理', navigate: navigate, message: '只有超级管理员才能访问用户管理', users: null, error: '权限不足' });
+      return res.render('users', { title: t.users.title, navigate: navigate, message: null, users: null, error: t.users.no_permission });
     }
 
-    res.render('users', { title: '用户管理', navigate: navigate, message: '所有用户列表（仅超级管理员可见）', users: users });
+    const message = req.session.success || null;
+    req.session.success = null; // 清除消息
+    res.render('users', { title: t.users.title, navigate: navigate, message: message, users: users });
   } catch (err) {
-    res.render('users', { title: '用户管理', navigate: navigate, message: '错误', users: null, error: '返回用户列表时出错：' + err });
+    res.render('users', { title: t.users.title, navigate: navigate, message: null, users: null, error: t.users.error_prefix + err });
   }
 }
 
@@ -77,7 +81,9 @@ exports.password_get = async function(req, res) {
       password1: null,
       password2: null
     };
-  res.render('password', { title: '设置密码', navigate: navigate, user: user, readonly: true, message: '' });
+
+  const t = res.locals.t;
+  res.render('password', { title: t.password.title_set, navigate: navigate, user: user, readonly: true, message: '' });
 }
 
 exports.password_post = async function(req, res) {
@@ -86,16 +92,18 @@ exports.password_post = async function(req, res) {
       active: 'users',
     }
 
+  const t = res.locals.t;
+
   req.checkBody('username', 'Username required').notEmpty();
   req.sanitize('username').escape();
   req.sanitize('username').trim();
 
-  req.checkBody('password1', '密码必填').notEmpty();
-  req.checkBody('password1', '最小密码长度为 ' + min_pass_len + ' 个字符').isLength({ min: min_pass_len, max: 160 });
+  req.checkBody('password1', 'Password required').notEmpty();
+  req.checkBody('password1', 'Minimum password length is ' + min_pass_len + ' characters').isLength({ min: min_pass_len, max: 160 });
 
-  req.checkBody('password2', '请重新输入密码').notEmpty();
-  req.checkBody('password2', '最小密码长度为 ' + min_pass_len + ' 个字符').isLength({ min: min_pass_len, max: 160 });
-  req.checkBody('password2', '密码不相同').equals(req.body.password1);
+  req.checkBody('password2', 'Re-enter password').notEmpty();
+  req.checkBody('password2', 'Minimum password length is ' + min_pass_len + ' characters').isLength({ min: min_pass_len, max: 160 });
+  req.checkBody('password2', 'Passwords do not match').equals(req.body.password1);
 
   const errors = req.validationErrors();
 
@@ -106,8 +114,8 @@ exports.password_post = async function(req, res) {
         password1: req.body.password1,
         password2: req.body.password2
       };
-    const message = '请检查以下错误';
-    res.render('password', { title: '设置密码', navigate: navigate, user: user, readonly: true, message: message, errors: errors });
+    const message = t.password.check_errors;
+    res.render('password', { title: t.password.title_set, navigate: navigate, user: user, readonly: true, message: message, errors: errors });
   } else {
     let pass_set = true;
     if (req.body.pass_set === 'check') pass_set = false;
@@ -131,8 +139,8 @@ exports.password_post = async function(req, res) {
 
     users = await update_users(users);
 
-    const message = '成功为 ' + req.body.username + ' 设置密码';
-    res.render('password', { title: '设置密码', navigate: navigate, user: user, readonly: true, message: message });
+    const message = t.password.success.replace('%s', req.body.username);
+    res.render('password', { title: t.password.title_set, navigate: navigate, user: user, readonly: true, message: message });
   }
 }
 
@@ -149,7 +157,8 @@ exports.user_create_get = async function(req, res) {
       password2: null
     };
 
-  res.render('password', { title: '创建新管理员用户', navigate: navigate, user: user, readonly: false});
+  const t = res.locals.t;
+  res.render('password', { title: t.password.title, navigate: navigate, user: user, readonly: false});
 }
 
 exports.user_create_post = async function(req, res) {
@@ -175,7 +184,7 @@ exports.register_get = function(req, res) {
       password2: null
     };
 
-  res.render('register', { title: '注册新用户', navigate: navigate, user: user, readonly: false, message: '' });
+  res.render('register', { title: res.locals.t.register.title, navigate: navigate, user: user, readonly: false, message: '' });
 }
 
 exports.register_post = async function(req, res) {
@@ -183,6 +192,8 @@ exports.register_post = async function(req, res) {
     {
       active: 'register',
     }
+
+  const t = res.locals.t;
 
   req.checkBody('username', '用户名必填').notEmpty();
   req.sanitize('username').escape();
@@ -205,7 +216,7 @@ exports.register_post = async function(req, res) {
         password2: req.body.password2
       };
     const message = '请检查以下错误';
-    res.render('register', { title: '注册新用户', navigate: navigate, user: user, message: message, errors: errors });
+    res.render('register', { title: t.register.title, navigate: navigate, user: user, message: message, errors: errors });
   } else {
     try {
       let users = await get_users();
@@ -218,7 +229,7 @@ exports.register_post = async function(req, res) {
             password1: req.body.password1,
             password2: req.body.password2
           };
-        return res.render('register', { title: '注册新用户', navigate: navigate, user: user, error: '用户名已存在，请选择其他用户名' });
+        return res.render('register', { title: t.register.title, navigate: navigate, user: user, error: t.register.user_exists });
       }
 
       let pass_set = false;
@@ -241,8 +252,8 @@ exports.register_post = async function(req, res) {
       users[req.body.username] = user;
       users = await update_users(users);
 
-      const message = '用户 ' + req.body.username + ' 注册成功，请登录';
-      res.render('register', { title: '注册新用户', navigate: navigate, user: user, message: message, readonly: true });
+      const message = t.register.success.replace('%s', req.body.username);
+      res.render('register', { title: t.register.title, navigate: navigate, user: user, message: message, readonly: true });
     } catch (err) {
       const user =
         {
@@ -250,7 +261,7 @@ exports.register_post = async function(req, res) {
           password1: req.body.password1,
           password2: req.body.password2
         };
-      res.render('register', { title: '注册新用户', navigate: navigate, user: user, error: '注册失败：' + err });
+      res.render('register', { title: t.register.title, navigate: navigate, user: user, error: '注册失败：' + err });
     }
   }
 }
@@ -354,7 +365,8 @@ exports.user_reset_password_post = async function(req, res) {
   users[req.params.name] = user;
   await update_users(users);
 
-  const message = '已重置用户 ' + req.params.name + ' 的密码为：' + newPassword;
+  const t = req.app.get('translations') ? req.app.get('translations')[req.session.lang || 'en'] : res.locals.t;
+  const message = t.users.reset_success.replace('%s', req.params.name).replace('%s', newPassword);
   req.session.success = message;
   res.redirect('/users');
 }

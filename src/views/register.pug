@@ -1,0 +1,67 @@
+//-
+  ztncui - ZeroTier network controller UI
+  Copyright (C) 2017-2021  TsingWin (http://www.tsingwin.net)
+  Licensed under GPLv3 - see LICENSE for details.
+
+extends head_layout
+
+block nav_items
+  li
+    a(href='/') #{t.nav.home}
+
+block body_content
+  .container(style='margin-top:50px')
+    .row
+      .col-sm-12
+        h1= title
+
+        if message
+          .alert.alert-success
+            button.close(type='button', data-dismiss='alert') &times;
+            strong= message
+
+        if error
+          .alert.alert-danger
+            button.close(type='button', data-dismiss='alert') &times;
+            strong= error
+
+    form.form-horizontal(method='POST' action='')
+      if errors
+        .alert.alert-danger
+          ul
+            each error in errors
+              li= error.msg
+
+      .form-group.row
+        .col-sm-2
+          label.control-label(for='username') #{t.register.username}
+        .col-sm-10
+          .input-group
+            span.input-group-addon
+              i.glyphicon.glyphicon-user
+            input#username.form-control(type='text' name='username' placeholder=t.register.username_placeholder value=user.name readonly=readonly)
+
+      .form-group.row
+        .col-sm-2
+          label.control-label(for='password1') #{t.register.password}
+        .col-sm-10
+          .input-group
+            span.input-group-addon
+              i.glyphicon.glyphicon-lock
+            input#password1.form-control(type='password' name='password1' placeholder=t.register.password_placeholder)
+
+      .form-group.row
+        .col-sm-2
+          label.control-label(for='password2') #{t.register.confirm_password}
+        .col-sm-10
+          .input-group
+            span.input-group-addon
+              i.glyphicon.glyphicon-lock
+            input#password2.form-control(type='password' name='password2' placeholder=t.register.confirm_password_placeholder)
+
+      .form-group.row
+        .col-sm-2
+        .col-sm-10
+          button.btn.btn-primary(type='submit') #{t.register.register_button}
+          = ' '
+          a.btn.btn-default(href='/' name='cancel' role='button') #{t.register.cancel_button}

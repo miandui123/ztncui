@@ -8,6 +8,7 @@ const express = require('express');
 const router = express.Router();
 const auth = require('../controllers/auth');
 const restrict = auth.restrict;
+const restrictSuperAdmin = auth.restrictSuperAdmin;
 const usersController = require('../controllers/usersController');
 
 // GET request for users
@@ -24,6 +25,12 @@ router.get('/create', restrict, usersController.user_create_get);
 
 // POST request for user create
 router.post('/create', restrict, usersController.user_create_post);
+
+// POST request for user promote to admin
+router.post('/:name/promote', restrictSuperAdmin, usersController.user_promote_post);
+
+// POST request for user reset password
+router.post('/:name/reset-password', restrictSuperAdmin, usersController.user_reset_password_post);
 
 // GET request for user delete
 router.get('/:name/delete', restrict, usersController.user_delete);

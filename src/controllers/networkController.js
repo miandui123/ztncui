@@ -66,11 +66,13 @@ exports.index = async function(req, res) {
       active: 'controller_home',
     }
 
+  const t = res.locals.t;
+
   try {
     const zt_status = await zt.get_zt_status();
-    res.render('index', {title: 'ztncui', navigate: navigate, zt_status});
+    res.render('index', {title: t.nav.controller_home, navigate: navigate, zt_status});
   } catch (err) {
-    res.render('index', {title: 'ztncui',
+    res.render('index', {title: t.nav.controller_home,
                       navigate: navigate, error: '获取 ZT 状态时出错：' + err});
   }
 };

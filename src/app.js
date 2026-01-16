@@ -19,6 +19,7 @@ const helmet = require('helmet');
 const index = require('./routes/index');
 const users = require('./routes/users');
 const zt_controller = require('./routes/zt_controller');
+const translations = require('./i18n');
 
 const app = express();
 
@@ -29,7 +30,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
 app.use(helmet());
-app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+// app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -41,10 +42,37 @@ app.use(session({
 app.use(expressValidator());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+// i18n middleware
+app.use(function(req, res, next) {
+  // Get language from session, cookie, or default to 'en'
+  req.session.lang = req.session.lang || req.cookies.lang || 'en';
+  res.locals.lang = req.session.lang;
+  res.locals.t = translations[res.locals.lang];
+  res.locals.user = req.session.user;
+  next();
+});
 app.use('/fonts', express.static(path.join(__dirname, 'node_modules/bootstrap/fonts')));
 app.use('/bscss', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/css')));
 app.use('/jqjs', express.static(path.join(__dirname, 'node_modules/jquery/dist')));
 app.use('/bsjs', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/js')));
+
+// language switching route
+app.get('/lang/:lang?', function(req, res, next) {
+  let lang = req.params.lang;
+  
+  // 如果没有指定语言参数，切换到另一个语言
+  if (!lang) {
+    const currentLang = req.session.lang || req.cookies.lang || 'en';
+    lang = currentLang === 'en' ? 'zh' : 'en';
+  }
+  
+  if (['en', 'zh'].includes(lang)) {
+    req.session.lang = lang;
+    res.cookie('lang', lang, { maxAge: 365 * 24 * 60 * 60 * 1000 }); // 1 year
+  }
+  res.redirect(req.header('Referer') || '/');
+});
 
 app.use('/', index);
 app.use('/users', users);

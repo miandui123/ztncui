@@ -1,17 +1,22 @@
 //-
-  ztncui - ZeroTier network controller UI
-  Copyright (C) 2017-2021  Key Networks (https://key-networks.com)
+  TsingWin - 算力网络控制平台
+  Copyright (C) 2017-2021  TsingWin (http://www.tsingwin.net)
   Licensed under GPLv3 - see LICENSE for details.
 
 extends controller_layout
 
 block content
-  h1!= title
+  //- h1!= title
 
   h2
-    a(href='https://zerotier.com' target='_blank') ZeroTier 
-    | network controller UI by 
-    a(href='https://key-networks.com' target='_blank') Key Networks
+    a(href='https://zerotier.com' target='_blank') TsingWin 
+    | - 算力网络控制平台v1.0
+    p 
+    p 
+    p 
+    p(style="font-size:12px; color:black;") 欢迎使用我们的网络控制平台
+
+    
 
   if error
      b #{error}
