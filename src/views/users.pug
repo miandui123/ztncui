@@ -20,12 +20,32 @@ block users_content
     table.table.table-responsive.table-striped.table-hover
       thead
         tr
-          th(width='5%') 操作
+          th(width='5%')
+            if t.users && t.users.table_headers && t.users.table_headers.actions
+              = t.users.table_headers.actions
+            else
+              = 'Actions'
           th(width='15%') #{t.register.username}
-          th(width='10%') 角色
-          th(width='15%') 密码状态
-          th(width='20%') 管理员操作
-          th(width='35%') 说明
+          th(width='10%')
+            if t.users && t.users.table_headers && t.users.table_headers.role
+              = t.users.table_headers.role
+            else
+              = 'Role'
+          th(width='15%')
+            if t.users && t.users.table_headers && t.users.table_headers.password_status
+              = t.users.table_headers.password_status
+            else
+              = 'Password Status'
+          th(width='20%')
+            if t.users && t.users.table_headers && t.users.table_headers.admin_operations
+              = t.users.table_headers.admin_operations
+            else
+              = 'Admin Operations'
+          th(width='35%')
+            if t.users && t.users.table_headers && t.users.table_headers.description
+              = t.users.table_headers.description
+            else
+              = 'Description'
       tbody
         each user in users
           tr
@@ -65,11 +85,11 @@ block users_content
               else
                 span.text-muted= t.users.super_admin_only
             td
-              - let desc = '可以管理网络控制器';
+              - let desc = t.users.desc_controller_admin;
               if user.role === 'admin'
-                - desc = '可以创建和管理用户';
+                - desc = t.users.desc_user_admin;
               if user.role === 'super_admin'
-                - desc = '最高权限，可以管理所有用户';
+                - desc = t.users.desc_super_admin;
               small.text-muted= desc
 
   else

@@ -42,7 +42,7 @@ exports.restrict = function(req, res, next) {
   if (req.session.user) {
     next();
   } else {
-    req.session.error = 'Access denied!';
+    req.session.error = res.locals.t && res.locals.t.login ? res.locals.t.login.title + ' ' + res.locals.t.login.login_button : 'Access denied!';
     res.redirect('/login?redirect=' + encodeURIComponent(req.originalUrl));
   }
 }
@@ -52,7 +52,7 @@ exports.restrictAdmin = function(req, res, next) {
   if (req.session.user && (req.session.user.role === 'admin' || req.session.user.role === 'super_admin')) {
     next();
   } else {
-    req.session.error = '需要管理员权限！';
+    req.session.error = res.locals.t && res.locals.t.users && res.locals.t.users.super_admin_only ? res.locals.t.users.super_admin_only : 'Admin access required!';
     res.redirect('/controller');
   }
 }
@@ -62,7 +62,7 @@ exports.restrictSuperAdmin = function(req, res, next) {
   if (req.session.user && req.session.user.role === 'super_admin') {
     next();
   } else {
-    req.session.error = '需要超级管理员权限！';
+    req.session.error = res.locals.t && res.locals.t.users && res.locals.t.users.super_admin_only ? res.locals.t.users.super_admin_only : 'Super admin access required!';
     res.redirect('/controller');
   }
 }

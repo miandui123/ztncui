@@ -263,6 +263,16 @@ const translations = {
     users: {
       title: '用户管理',
       no_users: '系统中还没有用户',
+      table_headers: {
+        actions: '操作',
+        role: '角色',
+        password_status: '密码状态',
+        admin_operations: '管理员操作',
+        description: '说明'
+      },
+      desc_controller_admin: '可以管理网络控制器',
+      desc_user_admin: '可以创建和管理用户',
+      desc_super_admin: '最高权限，可以管理所有用户',
       role_user: '普通用户',
       role_admin: '管理员',
       role_super_admin: '超级管理员',

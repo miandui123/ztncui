@@ -36,11 +36,23 @@ block content
           td
             = network.nwid
           td
-            a(href=nwurl) Detail
+            a(href=nwurl)
+              if t.networks && t.networks.detail
+                = t.networks.detail
+              else
+                = 'Detail'
           td
-            a(href=nwurl + '/easy') Easy Setup
+            a(href=nwurl + '/easy')
+              if t.networks && t.networks.easy_setup
+                = t.networks.easy_setup
+              else
+                = 'Easy Setup'
           td
-            a(href=nwurl + "#members") Members
+            a(href=nwurl + "#members")
+              if t.networks && t.networks.members_title
+                = t.networks.members_title
+              else
+                = 'Members'
 
       else
         .alert.alert-info
