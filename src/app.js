@@ -24,6 +24,21 @@ const translations = require('./i18n');
 
 const app = express();
 
+// Add missing translation keys to prevent undefined errors
+translations.en.nav = translations.en.nav || {};
+translations.en.nav.home = translations.en.nav.home || 'Home';
+translations.en.nav.users = translations.en.nav.users || 'Users';
+translations.en.nav.logout = translations.en.nav.logout || 'Logout';
+translations.en.nav.register = translations.en.nav.register || 'Register';
+translations.en.nav.create_user = translations.en.nav.create_user || 'Create user';
+
+translations.zh.nav = translations.zh.nav || {};
+translations.zh.nav.home = translations.zh.nav.home || '首页';
+translations.zh.nav.users = translations.zh.nav.users || '用户';
+translations.zh.nav.logout = translations.zh.nav.logout || '退出';
+translations.zh.nav.register = translations.zh.nav.register || '注册';
+translations.zh.nav.create_user = translations.zh.nav.create_user || '创建用户';
+
 const session_secret = Math.random().toString(36).substring(2,12);
 
 // view engine setup
