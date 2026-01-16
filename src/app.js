@@ -15,6 +15,7 @@ const bodyParser = require('body-parser');
 const expressValidator = require('express-validator');
 const session = require('express-session');
 const helmet = require('helmet');
+const FileStore = require('session-file-store')(session);
 
 const index = require('./routes/index');
 const users = require('./routes/users');
@@ -37,7 +38,14 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(session({
   resave: false,
   saveUninitialized: false,
-  secret: session_secret
+  secret: session_secret,
+  store: new FileStore({
+    path: path.join(__dirname, 'sessions'),
+    logFn: function(){}
+  }),
+  cookie: {
+    maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+  }
 }));
 app.use(expressValidator());
 app.use(cookieParser());

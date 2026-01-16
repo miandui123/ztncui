@@ -18,10 +18,31 @@ block content
 
     
 
+  - const controllerAddressTextEn = 'This network controller has a ZeroTier address of'
+  - const controllerAddressTextZh = '此网络控制器具有ZeroTier地址'
+  - const versionTextEn = 'ZeroTier version'
+  - const versionTextZh = 'ZeroTier版本'
+  - const listNetworksTextEn = 'List all networks on this network controller'
+  - const listNetworksTextZh = '列出此网络控制器上的所有网络'
+  
   if error
      b #{error}
   else
-    h4 This network controller has a ZeroTier address of <b>#{zt_status.address}</b>
-    h4 ZeroTier version <b>#{zt_status.version}</b>
     h4
-      a(href='/controller/networks') List all networks on this network controller
+      if t.lang && t.lang.toggle === '中'
+        = controllerAddressTextZh
+      else
+        = controllerAddressTextEn
+      |  <b>#{zt_status.address}</b>
+    h4
+      if t.lang && t.lang.toggle === '中'
+        = versionTextZh
+      else
+        = versionTextEn
+      |  <b>#{zt_status.version}</b>
+    h4
+      a(href='/controller/networks')
+        if t.lang && t.lang.toggle === '中'
+          = listNetworksTextZh
+        else
+          = listNetworksTextEn

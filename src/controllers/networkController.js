@@ -84,11 +84,13 @@ exports.network_list = async function(req, res) {
       active: 'networks',
     }
 
+  const t = res.locals.t;
+
   try {
     networks = await zt.network_list();
-    res.render('networks', {title: '此控制器上的网络', navigate: navigate, networks: networks});
+    res.render('networks', {title: t.networks.title, navigate: navigate, networks: networks});
   } catch (err) {
-    res.render('networks', {title: '此控制器上的网络', navigate: navigate, error: '从此控制器检索网络列表时出错：' + err});
+    res.render('networks', {title: t.networks.title, navigate: navigate, error: '从此控制器检索网络列表时出错：' + err});
   }
 };
 
@@ -108,9 +110,11 @@ exports.network_detail = async function(req, res) {
       get_network_with_members(req.params.nwid),
       zt.get_zt_address()
     ]);
-    res.render('network_detail', {title: '网络 ' + network.name, navigate: navigate, network: network, members: members, zt_address: zt_address});
+    const t = res.locals.t;
+    res.render('network_detail', {title: t.networks.detail, navigate: navigate, network: network, members: members, zt_address: zt_address});
   } catch (err) {
-    res.render('network_detail', {title: '网络详情', navigate: navigate, error: '解析网络 ' + req.params.nwid + ' 的详情时出错：' + err});
+    const t = res.locals.t;
+    res.render('network_detail', {title: t.networks.detail, navigate: navigate, error: '解析网络 ' + req.params.nwid + ' 的详情时出错：' + err});
   }
 };
 
@@ -121,7 +125,8 @@ exports.network_create_get = function(req, res) {
       active: 'add_network',
     }
 
-  res.render('network_create', {title: '创建网络', navigate: navigate});
+  const t = res.locals.t;
+  res.render('network_create', {title: t.nav.add_network, navigate: navigate});
 };
 
 // Handle Network create on POST
@@ -139,16 +144,17 @@ exports.network_create_post = async function(req, res) {
   const errors = req.validationErrors();
 
   let name = { name: req.body.name };
+  const t = res.locals.t;
 
   if (errors) {
-    res.render('network_create', {title: '创建网络', navigate: navigate, name: name, errors: errors});
+    res.render('network_create', {title: t.nav.add_network, navigate: navigate, name: name, errors: errors});
     return;
   } else {
     try {
       const network = await zt.network_create(name);
       res.redirect('/controller/network/' + network.nwid);
     } catch (err) {
-      res.render('network_detail', {title: '创建网络 - 错误', navigate: navigate, error: '创建网络 ' + name.name + ' 时出错'});
+      res.render('network_detail', {title: t.nav.add_network + ' - ' + t.password.error_prefix, navigate: navigate, error: '创建网络 ' + name.name + ' 时出错'});
     }
   }
 };

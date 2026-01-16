@@ -6,23 +6,31 @@
 extends network_layout
 
 block net_content
+  - // 防御性编程：确保 member_delete_page 属性存在
+  - const memberDeletedText = t.networks.member_delete_page && t.networks.member_delete_page.member_deleted ? t.networks.member_delete_page.member_deleted : (t.lang && t.lang.toggle === '中' ? '已删除' : 'was deleted')
+  - const membersText = t.networks.member_delete_page && t.networks.member_delete_page.members ? t.networks.member_delete_page.members : (t.lang && t.lang.toggle === '中' ? '成员' : 'Members')
+  - const note1Text = t.networks.member_delete_page && t.networks.member_delete_page.note1 ? t.networks.member_delete_page.note1 : (t.lang && t.lang.toggle === '中' ? '要撤销删除成员，只需让成员再次加入网络。' : 'To undo a member deletion, just get the member to join the network again.')
+  - const note2Text = t.networks.member_delete_page && t.networks.member_delete_page.note2 ? t.networks.member_delete_page.note2 : (t.lang && t.lang.toggle === '中' ? '删除成员后，您可能会看到他们再次出现在成员列表中。这是ZeroTier的问题。只需让用户离开网络。' : 'After deleting a member, you may see them appear in the list of members again. This is a ZeroTier issue. Just get the user to leave the network.')
+  - const deleteMemberText = t.networks.member_delete_page && t.networks.member_delete_page.delete_member ? t.networks.member_delete_page.delete_member : (t.lang && t.lang.toggle === '中' ? '删除' : 'Delete')
+  - const cancelText = t.networks.member_delete_page && t.networks.member_delete_page.cancel ? t.networks.member_delete_page.cancel : (t.lang && t.lang.toggle === '中' ? '取消' : 'Cancel')
+
   if member.deleted
     .alert.alert-success
-      strong #{member.name} (#{member.id}) was deleted
-    a.btn.btn-default(href=('/controller/network/' + network.nwid + '#members') name='networks' role='button') Members
+      strong #{member.name} (#{member.id}) #{memberDeletedText}
+    a.btn.btn-default(href=('/controller/network/' + network.nwid + '#members') name='networks' role='button')= membersText
 
   else
     .alert.alert-info
       strong
         ul
-          li To undo a member deletion, just get the member to join the network again.
-          li After deleting a member, you may see them appear in the list of members again.  This is a ZeroTier issue.  Just get the user to leave the network.
+          li= note1Text
+          li= note2Text
 
     form(method='POST' action='')
-      button.btn.btn-primary(type='submit', name='delete') Delete #{member.name} (#{member.id})
+      button.btn.btn-primary(type='submit', name='delete') #{deleteMemberText} #{member.name} (#{member.id})
       = ' '
       a.btn.btn-default(href='/controller/network/' + network.nwid + '#members',
-                                          name='cancel', role='button') Cancel
+                                          name='cancel', role='button')= cancelText
 
   if errors
     ul

@@ -18,7 +18,10 @@ block net_content
       tr
         td(width='3%')
           input#privateCheckBox.checkbox(type='checkbox' checked=(network.private? true : false))
-        td Enable access control.  Warning: if you disable this, you will not be able to de-authorize members of the network.  Disable this only if you know what you are doing.
+        - const privateTextEn = 'Enable access control. Warning: if you disable this, you will not be able to de-authorize members of the network. Disable this only if you know what you are doing.'
+        - const privateTextZh = '启用访问控制。警告：如果您禁用此功能，将无法取消授权网络成员。请仅在您知道自己在做什么时禁用。'
+        - const privatePageText = t.networks.private_page ? t.networks.private_page.enable_access_control : (t.lang && t.lang.toggle === '中' ? privateTextZh : privateTextEn)
+        td= privatePageText
 
   if errors
     ul

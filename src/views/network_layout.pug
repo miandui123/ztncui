@@ -6,6 +6,11 @@
 extends controller_layout
 
 block content
+  - const networkTextEn = 'Network'
+  - const networkTextZh = '网络'
+  - const backTextEn = 'Back'
+  - const backTextZh = '返回'
+  
   if error
      b #{error}
   else
@@ -13,7 +18,11 @@ block content
       .col-sm-10
         block network_title
           h2
-            | Network 
+            if t.lang && t.lang.toggle === '中'
+              = networkTextZh
+            else
+              = networkTextEn
+            | 
             a(href='/controller/network/' + network.nwid) #{network.name}
             |  (#{network.nwid}):
         block title
@@ -22,5 +31,9 @@ block content
 
       .col-sm-2
         h2.right
-          a.btn.btn-default(href=navigate.whence role='button') Back
+          a.btn.btn-default(href=navigate.whence role='button')
+            if t.lang && t.lang.toggle === '中'
+              = backTextZh
+            else
+              = backTextEn
     block net_content

@@ -6,17 +6,22 @@
 extends network_layout
 
 block net_content
+  - // 防御性编程：确保 delete_page 属性存在
+  - const networkDeletedText = t.networks.delete_page && t.networks.delete_page.network_deleted ? t.networks.delete_page.network_deleted : (t.lang && t.lang.toggle === '中' ? '已删除' : 'was deleted')
+  - const warningText = t.networks.delete_page && t.networks.delete_page.warning ? t.networks.delete_page.warning : (t.lang && t.lang.toggle === '中' ? '警告！删除网络无法撤销' : 'Warning! Deleting a network cannot be undone')
+  - const cancelText = t.networks.delete_page && t.networks.delete_page.cancel ? t.networks.delete_page.cancel : (t.lang && t.lang.toggle === '中' ? '取消' : 'Cancel')
+
   if network.deleted
     .alert.alert-success
-      strong #{network.name} (#{network.nwid}) was deleted
+      strong #{network.name} (#{network.nwid}) #{networkDeletedText}
 
   else
     .alert.alert-danger
-      strong Warning! Deleting a network cannot be undone
+      strong= warningText
     form(method='POST' action='')
-      button.btn.btn-danger(type='submit', name='delete') Delete #{network.name} (#{network.nwid})
+      button.btn.btn-danger(type='submit', name='delete') #{networkDeletedText} #{network.name} (#{network.nwid})
       = ' '
-      a.btn.btn-default(href='/controller/networks', name='cancel', role='button') Cancel
+      a.btn.btn-default(href='/controller/networks', name='cancel', role='button')= cancelText
 
   if errors
     ul

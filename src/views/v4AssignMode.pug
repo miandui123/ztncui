@@ -13,12 +13,19 @@ block net_content
       });
     });
 
+  - const autoAssignTextEn = 'Auto assign from ZT range'
+  - const autoAssignTextZh = '从ZT范围自动分配'
+  
   form(method='POST' action='')
     table.table.table-responsive.table-striped.table-hover
       tr
         td(width='3%')
           input#v4AssignModeCheckBox.checkbox(type='checkbox' checked=(network.v4AssignMode.zt? true : false))
-        td Auto-assign from IP Assignment Pool
+        td
+          if t.networks && t.networks.v4_assign_page && t.networks.v4_assign_page.auto_assign
+            = t.networks.v4_assign_page.auto_assign
+          else
+            = t.lang && t.lang.toggle === '中' ? autoAssignTextZh : autoAssignTextEn
 
   if errors
     ul

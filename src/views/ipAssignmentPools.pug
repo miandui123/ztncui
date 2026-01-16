@@ -6,13 +6,26 @@
 extends network_layout
 
 block net_content
+  - const ipRangeStartTextEn = 'IP Range Start'
+  - const ipRangeStartTextZh = 'IP范围起始'
+  - const ipRangeEndTextEn = 'IP Range End'
+  - const ipRangeEndTextZh = 'IP范围结束'
+  
   .row
     .col-sm-12
       table.table.table-responsive.table-striped.table-hover
         tr
           th
-          th IP range start
-          th IP range end
+          th
+            if t.networks && t.networks.ip_pools_page && t.networks.ip_pools_page.ip_range_start
+              = t.networks.ip_pools_page.ip_range_start
+            else
+              = t.lang && t.lang.toggle === '中' ? ipRangeStartTextZh : ipRangeStartTextEn
+          th
+            if t.networks && t.networks.ip_pools_page && t.networks.ip_pools_page.ip_range_end
+              = t.networks.ip_pools_page.ip_range_end
+            else
+              = t.lang && t.lang.toggle === '中' ? ipRangeEndTextZh : ipRangeEndTextEn
           each ipAssignmentPool in network.ipAssignmentPools
             tr
               td(width='3%')
@@ -21,28 +34,80 @@ block net_content
               td= ipAssignmentPool.ipRangeStart
               td= ipAssignmentPool.ipRangeEnd
 
+  - const addNewPoolTextEn = 'Add new pool:'
+  - const addNewPoolTextZh = '添加新池:'
+  - const ipRangeStartLabelTextEn = 'IP Range Start:'
+  - const ipRangeStartLabelTextZh = 'IP范围起始:'
+  - const ipRangeStartPlaceholderTextEn = 'e.g. 10.147.20.1'
+  - const ipRangeStartPlaceholderTextZh = '例如: 10.147.20.1'
+  - const ipRangeEndLabelTextEn = 'IP Range End:'
+  - const ipRangeEndLabelTextZh = 'IP范围结束:'
+  - const ipRangeEndPlaceholderTextEn = 'e.g. 10.147.20.254'
+  - const ipRangeEndPlaceholderTextZh = '例如: 10.147.20.254'
+  - const submitTextEn = 'Submit'
+  - const submitTextZh = '提交'
+  - const cancelTextEn = 'Cancel'
+  - const cancelTextZh = '取消'
+  
   .row
     .col-sm-12
-      h3 Add new IP Assignment Pool:
+      h3
+        if t.networks && t.networks.ip_pools_page && t.networks.ip_pools_page.add_new_pool
+          = t.networks.ip_pools_page.add_new_pool
+        else
+          = t.lang && t.lang.toggle === '中' ? addNewPoolTextZh : addNewPoolTextEn
 
   form(method='POST' action='/controller/network/' + network.nwid + '/ipAssignmentPools')
+    - let ipRangeStartLabel = ipRangeStartLabelTextEn;
+    - let ipRangeStartPlaceholder = ipRangeStartPlaceholderTextEn;
+    if t.lang && t.lang.toggle === '中'
+      - ipRangeStartLabel = ipRangeStartLabelTextZh;
+      - ipRangeStartPlaceholder = ipRangeStartPlaceholderTextZh;
+    else if t.networks && t.networks.ip_pools_page
+      if t.networks.ip_pools_page.ip_range_start_label
+        - ipRangeStartLabel = t.networks.ip_pools_page.ip_range_start_label;
+      if t.networks.ip_pools_page.ip_range_start_placeholder
+        - ipRangeStartPlaceholder = t.networks.ip_pools_page.ip_range_start_placeholder;
+    
     .form-group.row
       .col-sm-2
-        label(for='ipRangeStart') IP range start:
+        label(for='ipRangeStart')= ipRangeStartLabel
       .col-sm-12
-        input#ipRangeStart.form-control(type='text' name='ipRangeStart' placeholder='IP range start' value=(undefined===ipAssignmentPool? '' : ipAssignmentPool.ipRangeStart))
+        input#ipRangeStart.form-control(type='text' name='ipRangeStart' placeholder=ipRangeStartPlaceholder value=(undefined===ipAssignmentPool? '' : ipAssignmentPool.ipRangeStart))
 
+    - let ipRangeEndLabel = ipRangeEndLabelTextEn;
+    - let ipRangeEndPlaceholder = ipRangeEndPlaceholderTextEn;
+    if t.lang && t.lang.toggle === '中'
+      - ipRangeEndLabel = ipRangeEndLabelTextZh;
+      - ipRangeEndPlaceholder = ipRangeEndPlaceholderTextZh;
+    else if t.networks && t.networks.ip_pools_page
+      if t.networks.ip_pools_page.ip_range_end_label
+        - ipRangeEndLabel = t.networks.ip_pools_page.ip_range_end_label;
+      if t.networks.ip_pools_page.ip_range_end_placeholder
+        - ipRangeEndPlaceholder = t.networks.ip_pools_page.ip_range_end_placeholder;
+    
     .form-group.row
       .col-sm-2
-        label(for='ipRangeEnd') IP range end:
+        label(for='ipRangeEnd')= ipRangeEndLabel
       .col-sm-12
-        input#ipRangeEnd.form-control(type='text' name='ipRangeEnd' placeholder='IP range end' value=(undefined===ipAssignmentPool? '' : ipAssignmentPool.ipRangeEnd))
+        input#ipRangeEnd.form-control(type='text' name='ipRangeEnd' placeholder=ipRangeEndPlaceholder value=(undefined===ipAssignmentPool? '' : ipAssignmentPool.ipRangeEnd))
 
+    - let submitBtnText = submitTextEn;
+    - let cancelBtnText = cancelTextEn;
+    if t.lang && t.lang.toggle === '中'
+      - submitBtnText = submitTextZh;
+      - cancelBtnText = cancelTextZh;
+    else if t.networks && t.networks.ip_pools_page
+      if t.networks.ip_pools_page.submit
+        - submitBtnText = t.networks.ip_pools_page.submit;
+      if t.networks.ip_pools_page.cancel
+        - cancelBtnText = t.networks.ip_pools_page.cancel;
+    
     .form-group.row
       .col-sm-12
-        button.btn.btn-primary(type='submit') Submit
+        button.btn.btn-primary(type='submit')= submitBtnText
         = ' '
-        a.btn.btn-default(href='/controller/network/' + network.nwid name='cancel' role='button') Cancel
+        a.btn.btn-default(href='/controller/network/' + network.nwid name='cancel' role='button')= cancelBtnText
 
   if errors
     .row

@@ -6,13 +6,26 @@
 extends network_layout
 
 block net_content
+  - const targetTextEn = 'Target'
+  - const targetTextZh = '目标'
+  - const gatewayTextEn = 'Gateway'
+  - const gatewayTextZh = '网关'
+  
   .row
     .col-sm-12
       table.table.table-responsive.table-striped.table-hover
         tr
           th
-          th Target
-          th Gateway
+          th
+            if t.networks && t.networks.routes_page && t.networks.routes_page.target
+              = t.networks.routes_page.target
+            else
+              = t.lang && t.lang.toggle === '中' ? targetTextZh : targetTextEn
+          th
+            if t.networks && t.networks.routes_page && t.networks.routes_page.gateway
+              = t.networks.routes_page.gateway
+            else
+              = t.lang && t.lang.toggle === '中' ? gatewayTextZh : gatewayTextEn
           each route in network.routes
             tr
               td(width='3%')
@@ -21,28 +34,80 @@ block net_content
               td= route.target
               td= route.via
 
+  - const addNewRouteTextEn = 'Add new route:'
+  - const addNewRouteTextZh = '添加新路由:'
+  - const targetLabelTextEn = 'Target:'
+  - const targetLabelTextZh = '目标:'
+  - const targetPlaceholderTextEn = 'e.g. 10.11.12.0/24'
+  - const targetPlaceholderTextZh = '例如: 10.11.12.0/24'
+  - const gatewayLabelTextEn = 'Gateway:'
+  - const gatewayLabelTextZh = '网关:'
+  - const gatewayPlaceholderTextEn = 'e.g. 172.16.2.1 or leave blank if the target is the ZT network'
+  - const gatewayPlaceholderTextZh = '例如: 172.16.2.1 或留空如果目标是ZT网络'
+  - const submitTextEn = 'Submit'
+  - const submitTextZh = '提交'
+  - const cancelTextEn = 'Cancel'
+  - const cancelTextZh = '取消'
+  
   .row
     .col-sm-12
-      h3 Add new route:
+      h3
+        if t.networks && t.networks.routes_page && t.networks.routes_page.add_new_route
+          = t.networks.routes_page.add_new_route
+        else
+          = t.lang && t.lang.toggle === '中' ? addNewRouteTextZh : addNewRouteTextEn
 
   form(method='POST' action='/controller/network/' + network.nwid + '/routes')
+    - let targetLabel = targetLabelTextEn;
+    - let targetPlaceholder = targetPlaceholderTextEn;
+    if t.lang && t.lang.toggle === '中'
+      - targetLabel = targetLabelTextZh;
+      - targetPlaceholder = targetPlaceholderTextZh;
+    else if t.networks && t.networks.routes_page
+      if t.networks.routes_page.target_label
+        - targetLabel = t.networks.routes_page.target_label;
+      if t.networks.routes_page.target_placeholder
+        - targetPlaceholder = t.networks.routes_page.target_placeholder;
+    
     .form-group.row
       .col-sm-12
-        label(for='target') Target:
+        label(for='target')= targetLabel
       .col-sm-12
-        input#target.form-control(type='text' name='target' placeholder='e.g. 10.11.12.0/24' value=(undefined===route? '' : route.target))
+        input#target.form-control(type='text' name='target' placeholder=targetPlaceholder value=(undefined===route? '' : route.target))
 
+    - let gatewayLabel = gatewayLabelTextEn;
+    - let gatewayPlaceholder = gatewayPlaceholderTextEn;
+    if t.lang && t.lang.toggle === '中'
+      - gatewayLabel = gatewayLabelTextZh;
+      - gatewayPlaceholder = gatewayPlaceholderTextZh;
+    else if t.networks && t.networks.routes_page
+      if t.networks.routes_page.gateway_label
+        - gatewayLabel = t.networks.routes_page.gateway_label;
+      if t.networks.routes_page.gateway_placeholder
+        - gatewayPlaceholder = t.networks.routes_page.gateway_placeholder;
+    
     .form-group.row
       .col-sm-12
-        label(for='via') Gateway:
+        label(for='via')= gatewayLabel
       .col-sm-12
-        input#via.form-control(type='text' name='via' placeholder='e.g. 172.16.2.1 or leave blank if the target is the ZT network' value=(undefined===route? '' : route.via))
+        input#via.form-control(type='text' name='via' placeholder=gatewayPlaceholder value=(undefined===route? '' : route.via))
 
+    - let submitBtnText = submitTextEn;
+    - let cancelBtnText = cancelTextEn;
+    if t.lang && t.lang.toggle === '中'
+      - submitBtnText = submitTextZh;
+      - cancelBtnText = cancelTextZh;
+    else if t.networks && t.networks.routes_page
+      if t.networks.routes_page.submit
+        - submitBtnText = t.networks.routes_page.submit;
+      if t.networks.routes_page.cancel
+        - cancelBtnText = t.networks.routes_page.cancel;
+    
     .form-group.row
       .col-sm-12
-        button.btn.btn-primary(type='submit') Submit
+        button.btn.btn-primary(type='submit')= submitBtnText
         = ' '
-        a.btn.btn-default(href=('/controller/network/' + network.nwid) name='cancel' role='button') Cancel
+        a.btn.btn-default(href=('/controller/network/' + network.nwid) name='cancel' role='button')= cancelBtnText
 
   if errors
     .row

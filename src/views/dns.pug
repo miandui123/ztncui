@@ -7,47 +7,107 @@ extends network_layout
 
 block net_content
   - const dns = network.dns || {};
+  - const noDnsTextEn = 'No DNS configuration on this network.'
+  - const noDnsTextZh = '此网络没有DNS配置。'
+  - const domainTextEn = 'Domain:'
+  - const domainTextZh = '域名:'
+  - const serversTextEn = 'Servers:'
+  - const serversTextZh = '服务器:'
+  
   if (!dns.domain && !(dns.servers && dns.servers.length > 0))
     .row
       .col-sm-12
-        b No DNS configuration on this network.
+        b
+          if t.networks && t.networks.dns_page && t.networks.dns_page.no_dns
+            = t.networks.dns_page.no_dns
+          else
+            = t.lang && t.lang.toggle === '中' ? noDnsTextZh : noDnsTextEn
   else
     .row
       .col-sm-2
-        b Domain:
+        b
+          if t.networks && t.networks.dns_page && t.networks.dns_page.domain
+            = t.networks.dns_page.domain
+          else
+            = t.lang && t.lang.toggle === '中' ? domainTextZh : domainTextEn
       .col-sm-10
         p= dns.domain
     .row
       .col-sm-2
-        b Servers:
+        b
+          if t.networks && t.networks.dns_page && t.networks.dns_page.servers
+            = t.networks.dns_page.servers
+          else
+            = t.lang && t.lang.toggle === '中' ? serversTextZh : serversTextEn
       .col-sm-10
         .row
           each server in dns.servers
             .col-sm-12= server
 
+  - const changeDnsTextEn = 'Change DNS configuration:'
+  - const changeDnsTextZh = '更改DNS配置：'
+  
   .row
     .col-sm-12
-      h3 Change DNS configuration:
+      h3
+        if t.networks && t.networks.dns_page && t.networks.dns_page.change_dns
+          = t.networks.dns_page.change_dns
+        else
+          = t.lang && t.lang.toggle === '中' ? changeDnsTextZh : changeDnsTextEn
 
+  - const domainLabelTextEn = 'Domain:'
+  - const domainLabelTextZh = '域名：'
+  - const serversLabelTextEn = 'Servers:'
+  - const serversLabelTextZh = '服务器：'
+  - const serversPlaceholderTextEn = '(one IP address per line)'
+  - const serversPlaceholderTextZh = '（每行一个IP地址）'
+  - const submitTextEn = 'Submit'
+  - const submitTextZh = '提交'
+  - const cancelTextEn = 'Cancel'
+  - const cancelTextZh = '取消'
+  
   form(method='POST' action='')
     .form-group.row
       .col-sm-12
-        label(for='domain') Domain:
+        label(for='domain')
+          if t.networks && t.networks.dns_page && t.networks.dns_page.domain_label
+            = t.networks.dns_page.domain_label
+          else
+            = t.lang && t.lang.toggle === '中' ? domainLabelTextZh : domainLabelTextEn
       .col-sm-12
         input#domain.form-control(type='text' name='domain' value=dns.domain)
 
+    - let serversLabel = serversLabelTextEn;
+    - let serversPlaceholder = serversPlaceholderTextEn;
+    if t.lang && t.lang.toggle === '中'
+      - serversLabel = serversLabelTextZh;
+      - serversPlaceholder = serversPlaceholderTextZh;
+    else if t.networks && t.networks.dns_page
+      if t.networks.dns_page.servers_label
+        - serversLabel = t.networks.dns_page.servers_label;
+      if t.networks.dns_page.servers_placeholder
+        - serversPlaceholder = t.networks.dns_page.servers_placeholder;
+    
     .form-group.row
       .col-sm-12
-        label(for='servers') Servers:
+        label(for='servers')= serversLabel
       .col-sm-12
-        textarea#servers.form-control(type='text' name='servers' placeholder='(one IP address per line)')
+        textarea#servers.form-control(type='text' name='servers' placeholder=serversPlaceholder)
           = !dns.servers ? '' : dns.servers.join('\n')
 
     .form-group.row
       .col-sm-12
-        button.btn.btn-primary(type='submit') Submit
+        button.btn.btn-primary(type='submit')
+          if t.networks && t.networks.dns_page && t.networks.dns_page.submit
+            = t.networks.dns_page.submit
+          else
+            = t.lang && t.lang.toggle === '中' ? submitTextZh : submitTextEn
         = ' '
-        a.btn.btn-default(href=('/controller/network/' + network.nwid) name='cancel' role='button') Cancel
+        a.btn.btn-default(href=('/controller/network/' + network.nwid) name='cancel' role='button')
+          if t.networks && t.networks.dns_page && t.networks.dns_page.cancel
+            = t.networks.dns_page.cancel
+          else
+            = t.lang && t.lang.toggle === '中' ? cancelTextZh : cancelTextEn
 
   if errors
     .row

@@ -13,20 +13,39 @@ block net_content
       });
     });
 
+  - const zt6PlaneTextEn = '6PLANE (deprecated)'
+  - const zt6PlaneTextZh = '6PLANE（已弃用）'
+  - const ztRfc4193TextEn = 'RFC4193 (ULA fc00::/7)'
+  - const ztRfc4193TextZh = 'RFC4193 (ULA fc00::/7)'
+  - const autoAssignTextEn = 'Auto assign from ZT range'
+  - const autoAssignTextZh = '从ZT范围自动分配'
+  
   form(method='POST' action='')
     table.table.table-responsive.table-striped.table-hover
       tr
         td(width='3%')
           input#6planeCheckBox.checkbox(type='checkbox' checked=(network.v6AssignMode['6plane']? true : false))
-        td ZT 6plane (/80 routable for each device)
+        td
+          if t.networks && t.networks.v6_assign_page && t.networks.v6_assign_page.zt_6plane
+            = t.networks.v6_assign_page.zt_6plane
+          else
+            = t.lang && t.lang.toggle === '中' ? zt6PlaneTextZh : zt6PlaneTextEn
       tr
         td
           input#rfc4193CheckBox.checkbox(type='checkbox' checked=(network.v6AssignMode['rfc4193']? true : false))
-        td ZT rfc4193 (/128 for each device)
+        td
+          if t.networks && t.networks.v6_assign_page && t.networks.v6_assign_page.zt_rfc4193
+            = t.networks.v6_assign_page.zt_rfc4193
+          else
+            = t.lang && t.lang.toggle === '中' ? ztRfc4193TextZh : ztRfc4193TextEn
       tr
         td
           input#ztCheckBox.checkbox(type='checkbox' checked=(network.v6AssignMode['zt']? true : false))
-        td Auto-assign from IP Assignment Pool
+        td
+          if t.networks && t.networks.v6_assign_page && t.networks.v6_assign_page.auto_assign
+            = t.networks.v6_assign_page.auto_assign
+          else
+            = t.lang && t.lang.toggle === '中' ? autoAssignTextZh : autoAssignTextEn
 
   if errors
     ul

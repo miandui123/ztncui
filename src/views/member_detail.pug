@@ -7,7 +7,7 @@ extends network_layout
 
 block net_content
   h4
-    | for member #{member.name} (#{member.address}) in network
+    | Member Details: #{member.name} (#{member.address}) - In Network
 
   each value, key in member
     .row

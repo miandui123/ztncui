@@ -16,15 +16,15 @@ block content
         th(width='3%')
           = ''
         th(width='20%')
-          | Network name
+          = t.networks.table_headers.name
         th(width='20%')
-          | Network ID
+          = t.networks.table_headers.nwid
         th(width='8%')
           = ''
         th(width='12%')
           = ''
         th(width='37%')
-          = ''
+          = t.networks.table_headers.operations
       each network in networks
         - const nwurl = '/controller/network/' + network.nwid;
         tr
@@ -36,12 +36,12 @@ block content
           td
             = network.nwid
           td
-            a(href=nwurl) detail
+            a(href=nwurl) Detail
           td
-            a(href=nwurl + '/easy') easy setup
+            a(href=nwurl + '/easy') Easy Setup
           td
-            a(href=nwurl + "#members") members
+            a(href=nwurl + "#members") Members
 
       else
         .alert.alert-info
-          strong There are no networks on this network controller - click "Add network" above to create a new network.
+          strong= t.networks.no_networks

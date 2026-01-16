@@ -27,6 +27,9 @@ block net_content
       return ipv4;
     }
 
+    // Default to English, will be updated based on page language
+    let invalidCidrText = 'Invalid network CIDR';
+
     function CIDRtoPool(CIDR) {
       const [start, prefix] = CIDR.split('/');
       if (undefined !== start && undefined !== prefix &&
@@ -46,41 +49,63 @@ block net_content
         poolStart.value = int32toIPv4String(net32 + 1);  
         poolEnd.value = int32toIPv4String(bcast32 - 1);
       } else {
-        poolStart.value = 'Invalid network CIDR';
-        poolEnd.value = 'Invalid network CIDR';
+        poolStart.value = invalidCidrText;
+        poolEnd.value = invalidCidrText;
       }
     }
+
+    // Update text based on current language
+    document.addEventListener('DOMContentLoaded', function() {
+      const lang = document.documentElement.lang || 'en';
+      if (lang === 'zh') {
+        invalidCidrText = '无效的网络CIDR';
+      }
+    });
 
   if message
     .alert.alert-info
       strong= message
 
+  - // 防御性编程：确保所有 easy_setup_page 属性都存在
+  - const easySetupHelp = t.networks.easy_setup_page && t.networks.easy_setup_page.help ? t.networks.easy_setup_page.help : (t.lang && t.lang.toggle === '中' ? '帮助' : 'Help')
+  - const easySetupHelpNote1 = t.networks.easy_setup_page && t.networks.easy_setup_page.help_note1 ? t.networks.easy_setup_page.help_note1 : (t.lang && t.lang.toggle === '中' ? '请注意，此工具目前仅支持IPv4。' : 'Please note that this utility only supports IPv4 at this stage.')
+  - const easySetupHelpNote2 = t.networks.easy_setup_page && t.networks.easy_setup_page.help_note2 ? t.networks.easy_setup_page.help_note2 : (t.lang && t.lang.toggle === '中' ? '使用以下按钮自动生成随机网络地址，否则手动填写网络地址CIDR，IP分配池将自动为您计算。您可以手动修改这些计算值。' : 'Use the following button to automatically generate a random network address, otherwise fill in the network address CIDR manually and the IP assignment pool will be automatically calculated for you. You can manually alter these calculated values.')
+  - const easySetupGenerate = t.networks.easy_setup_page && t.networks.easy_setup_page.generate_network ? t.networks.easy_setup_page.generate_network : (t.lang && t.lang.toggle === '中' ? '生成网络地址' : 'Generate network address')
+  - const easySetupNetworkCidr = t.networks.easy_setup_page && t.networks.easy_setup_page.network_cidr ? t.networks.easy_setup_page.network_cidr : (t.lang && t.lang.toggle === '中' ? 'CIDR格式的网络地址' : 'Network address in CIDR notation')
+  - const easySetupNetworkCidrPlaceholder = t.networks.easy_setup_page && t.networks.easy_setup_page.network_cidr_placeholder ? t.networks.easy_setup_page.network_cidr_placeholder : (t.lang && t.lang.toggle === '中' ? '例如 10.11.12.0/24' : 'e.g. 10.11.12.0/24')
+  - const easySetupPoolStart = t.networks.easy_setup_page && t.networks.easy_setup_page.pool_start ? t.networks.easy_setup_page.pool_start : (t.lang && t.lang.toggle === '中' ? 'IP分配池起始' : 'Start of IP assignment pool')
+  - const easySetupPoolStartPlaceholder = t.networks.easy_setup_page && t.networks.easy_setup_page.pool_start_placeholder ? t.networks.easy_setup_page.pool_start_placeholder : (t.lang && t.lang.toggle === '中' ? '例如 10.11.12.1' : 'e.g. 10.11.12.1')
+  - const easySetupPoolEnd = t.networks.easy_setup_page && t.networks.easy_setup_page.pool_end ? t.networks.easy_setup_page.pool_end : (t.lang && t.lang.toggle === '中' ? 'IP分配池结束' : 'End of IP assignment pool')
+  - const easySetupPoolEndPlaceholder = t.networks.easy_setup_page && t.networks.easy_setup_page.pool_end_placeholder ? t.networks.easy_setup_page.pool_end_placeholder : (t.lang && t.lang.toggle === '中' ? '例如 10.11.12.254' : 'e.g. 10.11.12.254')
+  - const easySetupSubmit = t.networks.easy_setup_page && t.networks.easy_setup_page.submit ? t.networks.easy_setup_page.submit : (t.lang && t.lang.toggle === '中' ? '提交' : 'Submit')
+  - const easySetupCancel = t.networks.easy_setup_page && t.networks.easy_setup_page.cancel ? t.networks.easy_setup_page.cancel : (t.lang && t.lang.toggle === '中' ? '取消' : 'Cancel')
+
   form(method='POST' action='')
     .form-group
-      button.btn.btn-link.float-right(type='button' data-toggle='collapse' data-target='#help') Help
+      button.btn.btn-link.float-right(type='button' data-toggle='collapse' data-target='#help')= easySetupHelp
       .collapse(id='help')
-        p Please note that this utility only supports IPv4 at this stage.
-        p Use the following button to automatically generate a random network address, otherwise fill in the network address CIDR manually and the IP assignment pool will be automatically calculated for you.  You can manually alter these calculated values.
+        p= easySetupHelpNote1
+        p= easySetupHelpNote2
 
     .form-group
-      button.btn.btn-primary(id='genIPv4' type='button' onclick='randomIPv4()') Generate network address
+      button.btn.btn-primary(id='genIPv4' type='button' onclick='randomIPv4()')= easySetupGenerate
 
     .form-group
-      label(for='networkCIDR') Network address in CIDR notation
-      input#networkCIDR.form-control(type='text' name='networkCIDR' onchange='CIDRtoPool(this.value)' placeholder='e.g. 10.11.12.0/24' value=(undefined===network.routes[0]? '' : network.routes[0].target))
+      label(for='networkCIDR')= easySetupNetworkCidr
+      input#networkCIDR.form-control(type='text' name='networkCIDR' onchange='CIDRtoPool(this.value)' placeholder=easySetupNetworkCidrPlaceholder value=(undefined===network.routes[0]? '' : network.routes[0].target))
 
     .form-group
-      label(for='poolStart') Start of IP assignment pool
-      input#poolStart.form-control(type='text' name='poolStart' placeholder='e.g. 10.11.12.1' value=(undefined===network.ipAssignmentPools[0]? '' : network.ipAssignmentPools[0].ipRangeStart))
+      label(for='poolStart')= easySetupPoolStart
+      input#poolStart.form-control(type='text' name='poolStart' placeholder=easySetupPoolStartPlaceholder value=(undefined===network.ipAssignmentPools[0]? '' : network.ipAssignmentPools[0].ipRangeStart))
 
     .form-group
-      label(for='poolEnd') End of IP assignment pool
-      input#poolEnd.form-control(type='text' name='poolEnd' placeholder='e.g. 10.11.12.254' value=(undefined===network.ipAssignmentPools[0]? '' : network.ipAssignmentPools[0].ipRangeEnd))
+      label(for='poolEnd')= easySetupPoolEnd
+      input#poolEnd.form-control(type='text' name='poolEnd' placeholder=easySetupPoolEndPlaceholder value=(undefined===network.ipAssignmentPools[0]? '' : network.ipAssignmentPools[0].ipRangeEnd))
 
     .form-group(style='padding-top: 10px')
-      button.btn.btn-primary(type='submit') Submit
+      button.btn.btn-primary(type='submit')= easySetupSubmit
       = ' '
-      a.btn.btn-default(href=('/controller/network/' + network.nwid) name='cancel' role='button') Cancel
+      a.btn.btn-default(href=('/controller/network/' + network.nwid) name='cancel' role='button')= easySetupCancel
 
     if errors
       ul
